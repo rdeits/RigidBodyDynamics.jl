@@ -87,12 +87,12 @@ function isapprox{T}(x::Transform3D{T}, y::Transform3D{T}; atol::Real = 1e-12)
     return x.from == y.from && x.to == y.to && isapprox(theta, zero(T), atol = atol) && isapprox_tol(x.trans, y.trans, atol = atol)
 end
 
-function *{T}(t::Transform3D{T}, point::Point3D{T})
+function *{T1, T2}(t::Transform3D{T1}, point::Point3D{T2})
     @assert t.from == point.frame
-    return Point3D(t.to, rotate(point.v, t.rot) + t.trans)
+    return Point3D(t.to, Vec{3, promote_type(T1, T2)}(rotate(point.v, t.rot) + t.trans))
 end
 
-function *{T}(t::Transform3D{T}, vector::FreeVector3D{T})
+function *{T1, T2}(t::Transform3D{T1}, vector::FreeVector3D{T2})
     @assert t.from == vector.frame
-    return FreeVector3D(t.to, rotate(vector.v, t.rot))
+    return FreeVector3D(t.to, Vec{3, promote_type(T1, T2)}(rotate(vector.v, t.rot)))
 end
